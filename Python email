@@ -1,0 +1,49 @@
+import time
+import serial
+import smtplib
+
+TO = 'recipient@email.here'
+USER= 'USER@DOMAIN'
+EMAIL = 'sender@email.here'
+PASS = 'putsenderpasswordhere'
+SERVER = 'exchangeserver'
+PORT = 25
+SUBJECT01 = 'Temperature DANGER!!'
+SUBJECT02 = 'Temperature Warning!!'
+TEXT01 = 'Danger Will Robinson: NOC Temperature is too high'
+TEXT02 = 'Warning, The NOC Temperature is getting too high'
+
+ser = serial.Serial('COM4', 9600)
+
+def send_email01():
+    print("Sending Email")
+    smtpserver = smtplib.SMTP(SERVER, PORT)
+    smtpserver.starttls()
+    smtpserver.login(USER, PASS)
+    header = 'To:' + TO + '\n' + 'From: ' + USER
+    header = header + '\n' + 'Subject:' + SUBJECT01 + '\n'
+    print header
+    msg = header + '\n' + TEXT01 + ' \n\n'
+    smtpserver.sendmail(EMAIL, TO, msg)
+    smtpserver.close()
+
+def send_email02():
+    print("Sending Email")
+    smtpserver = smtplib.SMTP(SERVER, PORT)
+    smtpserver.starttls()
+    smtpserver.login(USER, PASS)
+    header = 'To:' + TO + '\n' + 'From: ' + USER
+    header = header + '\n' + 'Subject:' + SUBJECT02 + '\n'
+    print header
+    msg = header + '\n' + TEXT02 + ' \n\n'
+    smtpserver.sendmail(EMAIL, TO, msg)
+    smtpserver.close()
+
+while True:
+    message = ser.readline()
+    print(message)
+    if message[0] == 'W' :
+        send_email02()
+    if message[0] == 'D' :
+        send_email01()
+    time.sleep(60)
